@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+      "target": "esnext",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "lib": ["esnext", "dom"],
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true,
+      "jsx": "preserve",
+      "types": ["vue"]
+    },
+    "include": [
+      "src/**/*",  // Include all files in the `src` directory
+      "src/shims-vue.d.ts"  // Include the `shims-vue.d.ts` declaration file
+    ],
+    "exclude": [
+      "node_modules",  // Exclude the `node_modules` directory
+      "dist",  // Exclude the build output
+      "vite.config.ts"  // Optionally, exclude other config files
+    ]
+  }
+  
