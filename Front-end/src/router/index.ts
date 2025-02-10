@@ -8,6 +8,11 @@ const Contact = () => import('../views/Contact.vue');
 const Inscription = () => import('../views/Inscription.vue');
 const Connexion = () => import('../views/Connexion.vue');
 const PageIntrouvable = () => import('../views/PageIntrouvable.vue'); // Updated import
+const MenuLogged = () => import('../views/MenuLogged.vue');
+const Profile = () => import('../views/Profile.vue');
+const AccueilLogged = () => import('../views/Accueillogged.vue');
+const AProposLogged = () => import('../views/AProposLogged.vue'); 
+const ContactLogged = () => import('../views/ContactLogged.vue');
 
 // Create router instance
 const router = createRouter({
@@ -19,9 +24,24 @@ const router = createRouter({
       component: Accueil, // Root route - Accueil view
     },
     {
+      path: '/accueillogged',
+      name: 'accueil-logged',
+      component: AccueilLogged, 
+    },
+    {
       path: '/menu',
       name: 'menu',
       component: Menu, // Lazy-loaded Menu view
+    },
+    {
+      path: '/menu-logged',
+      name: 'menu-logged',
+      component: MenuLogged, // Lazy-loaded MenuLogged view for logged-in users
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile, // Lazy-loaded Profile view
     },
     {
       path: '/a-propos',
@@ -29,9 +49,19 @@ const router = createRouter({
       component: APropos, // Lazy-loaded APropos view
     },
     {
+      path: '/a-propos-logged',
+      name: 'a-propos-logged',
+      component: AProposLogged, 
+    },
+    {
       path: '/contact',
       name: 'contact',
       component: Contact, // Lazy-loaded Contact view
+    },
+    {
+      path: '/contactlogged',
+      name: 'contact-logged',
+      component: ContactLogged, 
     },
     {
       path: '/inscription',

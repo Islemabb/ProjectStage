@@ -9,6 +9,7 @@
     <div class="navbar-right">
       <router-link to="/inscription" class="auth-link">S'inscrire</router-link>
       <router-link to="/connexion" class="auth-link">Se connecter</router-link>
+
     </div>
   </nav>
 </template>

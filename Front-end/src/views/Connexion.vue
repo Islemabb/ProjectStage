@@ -58,7 +58,7 @@ const handleLogin = async () => {
 
     if (response.ok) {
       alert("Connexion réussie ✅");
-      router.push("/menu"); // Redirect to the menu page
+      router.push("/menu-logged"); // Redirect to the menu page
     } else {
       alert(data.error || "Email ou mot de passe incorrect ❌");
     }

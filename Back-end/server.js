@@ -113,6 +113,28 @@ const server = http.createServer((req, res) => {
         return;
       }
 
+      // 🔹 Handle Order Placement (/api/commander)
+      if (req.method === "POST" && req.url === "/api/commander") {
+        const { email, phone, address, order } = parsedBody;
+
+        if (!email || !phone || !address || !order || order.length === 0) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: "Tous les champs sont requis ❌" }));
+        }
+
+        const sql = "INSERT INTO commandes (email, tel, adresse, commande) VALUES (?, ?, ?, ?)";
+        db.query(sql, [email, phone, address, JSON.stringify(order)], (err) => {
+          if (err) {
+            console.error("Database Error:", err);
+            res.writeHead(500, { "Content-Type": "application/json" });
+            return res.end(JSON.stringify({ error: "Erreur de base de données ❌" }));
+          }
+          res.writeHead(201, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ message: "Commande passée avec succès ✅" }));
+        });
+        return;
+      }
+
       // Handle 404 Not Found
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Route non trouvée ❌" }));
