@@ -51,6 +51,7 @@ const handleLogin = async () => {
     const response = await fetch("http://localhost:5000/api/connexion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // Important pour envoyer les cookies de session
       body: JSON.stringify({ email: email.value, password: password.value }),
     });
 

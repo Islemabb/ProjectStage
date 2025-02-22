@@ -1,22 +1,80 @@
-const http = require("http");
-const mysql = require("mysql2");
+import express from "express";
+import mysql from "mysql2";
+import cors from "cors";
 
-// CORS Middleware
-const allowCors = (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+import passport from "passport";
+import session from "express-session";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcryptjs";
 
-  if (req.method === "OPTIONS") {
-    res.writeHead(204);
-    res.end();
-    return true;
-  }
-  return false;
-};
+import { routes } from "./src/route.js";
 
-// MySQL connection with error handling
-const db = mysql.createConnection({
+const app = express();
+const PORT = 5000;
+
+app.use(
+  session({
+    secret: "monsecret", // Change le secret !
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // ⚠️ Mettre `true` en production avec HTTPS
+      httpOnly: true,
+      sameSite: "lax", // Change à "none" si HTTPS (ex: pour déploiement)
+      maxAge: 1000 * 60 * 60, // 1 heure
+    },
+  })
+);
+
+// Initialiser Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configuration de la stratégie Passport-Local
+passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
+  const sql = "SELECT * FROM clients WHERE email = ?";
+  console.log(email,password);
+  db.query(sql, [email], (err, results) => {
+    if (err) return done(err);
+    if (results.length === 0) return done(null, false, { message: "Email introuvable ❌" });
+
+    const user = results[0];
+
+    // Vérifier le mot de passe
+    bcrypt.compare(password, user.mdp, (err, isMatch) => {
+      console.log('**',err,isMatch);
+      if (err) return done(err);
+      if (!isMatch) return done(null, false, { message: "Mot de passe incorrect ❌" });
+      return done(null, user);
+    });
+  });
+}));
+
+// Sérialisation & Désérialisation de l'utilisateur
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  const sql = "SELECT * FROM clients WHERE id = ?";
+  db.query(sql, [id], (err, results) => {
+    if (err) return done(err);
+    done(null, results[0]);
+  });
+});
+
+// Middleware
+// ✅ Configurer CORS pour autoriser les cookies
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Change selon ton frontend
+    credentials: true, // Autorise l'envoi des cookies de session
+  })
+);
+app.use(express.json());
+
+// MySQL connection
+export const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
@@ -26,123 +84,13 @@ const db = mysql.createConnection({
 db.connect((err) => {
   if (err) {
     console.error("❌ Database Connection Error:", err);
-    process.exit(1); // Stop the server if database fails
-  } else {
-    console.log("✅ Connected to MySQL Database");
+    process.exit(1);
   }
+  console.log("✅ Connected to MySQL Database");
 });
 
-const server = http.createServer((req, res) => {
-  if (allowCors(req, res)) return;
 
-  let body = "";
-  req.on("data", (chunk) => (body += chunk));
-  req.on("end", () => {
-    try {
-      const parsedBody = body ? JSON.parse(body) : null;
 
-      // 🔹 Handle User Registration (/api/inscription)
-      if (req.method === "POST" && req.url === "/api/inscription") {
-        const { firstName, lastName, email, phone, address, password } = parsedBody;
-
-        if (!firstName || !lastName || !email || !phone || !address || !password) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          return res.end(JSON.stringify({ error: "Tous les champs sont requis ❌" }));
-        }
-
-        const sql = "INSERT INTO clients (prenom, nom, email, tel, adresse, mdp) VALUES (?, ?, ?, ?, ?, ?)";
-        db.query(sql, [firstName, lastName, email, phone, address, password], (err) => {
-          if (err) {
-            console.error("Database Error:", err);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Erreur de base de données ❌" }));
-          }
-          res.writeHead(201, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ message: "Utilisateur enregistré avec succès ✅" }));
-        });
-        return;
-      }
-
-      // 🔹 Handle User Login (/api/connexion)
-      if (req.method === "POST" && req.url === "/api/connexion") {
-        const { email, password } = parsedBody;
-
-        if (!email || !password) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          return res.end(JSON.stringify({ error: "Email et mot de passe requis ❌" }));
-        }
-
-        const sql = "SELECT * FROM clients WHERE email = ? AND mdp = ?";
-        db.query(sql, [email, password], (err, results) => {
-          if (err) {
-            console.error("Database Error:", err);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Erreur de base de données ❌" }));
-          }
-
-          if (results.length > 0) {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ message: "Connexion réussie ✅", client: results[0] }));
-          } else {
-            res.writeHead(401, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Email ou mot de passe incorrect ❌" }));
-          }
-        });
-        return;
-      }
-
-      // 🔹 Handle Contact Form (/api/contact)
-      if (req.method === "POST" && req.url === "/api/contact") {
-        const { name, email, message } = parsedBody;
-
-        if (!name || !email || !message) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          return res.end(JSON.stringify({ error: "Tous les champs sont requis ❌" }));
-        }
-
-        const sql = "INSERT INTO contact (Nom, Email, Message) VALUES (?, ?, ?)";
-        db.query(sql, [name, email, message], (err) => {
-          if (err) {
-            console.error("Database Error:", err);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Erreur de base de données ❌" }));
-          }
-          res.writeHead(201, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ message: "Message envoyé avec succès ✅" }));
-        });
-        return;
-      }
-
-      // 🔹 Handle Order Placement (/api/commander)
-      if (req.method === "POST" && req.url === "/api/commander") {
-        const { email, phone, address, order } = parsedBody;
-
-        if (!email || !phone || !address || !order || order.length === 0) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          return res.end(JSON.stringify({ error: "Tous les champs sont requis ❌" }));
-        }
-
-        const sql = "INSERT INTO commandes (email, tel, adresse, commande) VALUES (?, ?, ?, ?)";
-        db.query(sql, [email, phone, address, JSON.stringify(order)], (err) => {
-          if (err) {
-            console.error("Database Error:", err);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Erreur de base de données ❌" }));
-          }
-          res.writeHead(201, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ message: "Commande passée avec succès ✅" }));
-        });
-        return;
-      }
-
-      // Handle 404 Not Found
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Route non trouvée ❌" }));
-    } catch (error) {
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Format JSON invalide ❌" }));
-    }
-  });
-});
-
-server.listen(5000, () => console.log("🚀 Server running at http://localhost:5000"));
+// Start Server
+routes(app);
+app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));

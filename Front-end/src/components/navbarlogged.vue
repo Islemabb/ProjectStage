@@ -18,8 +18,7 @@
     name: 'Navbar',
     methods: {
         logout() {
-          localStorage.removeItem("user");
-          localStorage.removeItem("cart");
+          axios.post('/logout');
           this.$router.push("/connexion");
         },
     },
