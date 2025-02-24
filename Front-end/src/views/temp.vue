@@ -1,5 +1,4 @@
 <template>
-  <navbarlogged/>
   <div class="menu-page">
     <!-- Search Bar -->
     <div class="search-bar">
@@ -112,7 +111,7 @@ import BurgerImage from '@/imgs/burger.png';
 import TacoImage from '@/imgs/taco.png';
 import DrinkImage from '@/imgs/drink.png';
 import SauceImage from '@/imgs/Sauce.png';
-import navbarlogged from '../components/navbarlogged.vue';
+
 
 const searchQuery = ref("");
 const cart = ref([]);

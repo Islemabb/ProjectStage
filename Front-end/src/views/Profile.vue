@@ -1,6 +1,5 @@
 <template>
   <div class="profile-container">
-    <NavbarLogged />
     <h1>Mon Compte</h1>
     <div v-if="user">
       <p><strong>Nom :</strong> {{ user.nom }}</p>
@@ -16,11 +15,10 @@
 </template>
 
 <script>
-import NavbarLogged from "../components/navbarlogged.vue";
 import axios from "axios";
 
 export default {
-  components: { NavbarLogged },
+ // components: { NavbarLogged },
   data() {
     return {
       user: null,

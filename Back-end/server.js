@@ -12,11 +12,12 @@ import { routes } from "./src/route.js";
 const app = express();
 const PORT = 5000;
 
+app.use(express.json()); 
 app.use(
   session({
     secret: "monsecret", // Change le secret !
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: false, // ⚠️ Mettre `true` en production avec HTTPS
       httpOnly: true,
@@ -33,7 +34,6 @@ app.use(passport.session());
 // Configuration de la stratégie Passport-Local
 passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
   const sql = "SELECT * FROM clients WHERE email = ?";
-  console.log(email,password);
   db.query(sql, [email], (err, results) => {
     if (err) return done(err);
     if (results.length === 0) return done(null, false, { message: "Email introuvable ❌" });

@@ -52,30 +52,6 @@
 </template>
 
 <script >
-import axios from "axios";
-import { useRouter } from "vue-router";
-
-
-
-export default {
-  data() {
-    return {
-      user: null,
-    };
-  },
-  async created() {
-    const router = useRouter();
-    try {
-
-      const response = await axios.get("http://localhost:5000/api/me", { withCredentials: true });
-      this.user = response.data.user;
-      router.push("/accueillogged");
-    } catch (error) {
-      console.error("Erreur lors de la récupération du profil :", error);
-      this.user = null;
-    }
-  },
-};
 </script>
 
 <style scoped>
