@@ -33,7 +33,7 @@
           class="info-icon"
         />
         <h3>Notre Adresse</h3>
-        <p>123 Rue de l'Entreprise, Paris, France</p>
+        <p>5 Pl. Edgar Quinet, 69006 Lyon, France</p>
       </div>
       <div class="info-block">
         <img
@@ -42,7 +42,7 @@
           class="info-icon"
         />
         <h3>Appelez-nous</h3>
-        <p>+33 1 23 45 67 89</p>
+        <p>+33 4 72 56 89 12</p>
       </div>
       <div class="info-block">
         <img
@@ -51,7 +51,7 @@
           class="info-icon"
         />
         <h3>Email sur</h3>
-        <p>contact@entreprise.com</p>
+        <p>contact@foodie.com</p>
       </div>
     </section>
 

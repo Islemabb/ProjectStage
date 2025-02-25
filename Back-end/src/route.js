@@ -23,7 +23,8 @@ export const routes = (app)=>{
     if (!req.user) {
       return res.status(401).json({ error: "Utilisateur non connecté ❌" });
     }
-    res.json({ user: req.user });
+    const { mdp , ...rest} = req.user;
+    res.json({ user: rest });
   });
 
   
