@@ -73,12 +73,12 @@ const getImagePath = (imageName) => {
 
 // Team data
 const team = ref([
-  { image: "employee1.jpg", position: "Manager", name: "John Doe" },
-  { image: "employee2.jpeg", position: "Chef", name: "Jane Smith" },
-  { image: "employee3.jpg", position: "Sous-Chef", name: "Michael Brown" },
-  { image: "employee4.jpg", position: "Server", name: "Emily White" },
-  { image: "employee5.jpg", position: "Cleaner", name: "Chris Green" },
-  { image: "employee6.jpg", position: "Cashier", name: "Sophia Black" },
+  { image: "employee1.jpg", position: "Manageur", name: "Amélie Dupont" },
+  { image: "employee2.jpeg", position: "Chef", name: "Claire Martin" },
+  { image: "employee3.jpg", position: "Sous-Chef", name: "Sophie Lefevre" },
+  { image: "employee4.jpg", position: "Serveur", name: "Camille Bernard" },
+  { image: "employee5.jpg", position: "Serveur", name: "Isabelle Moreau" },
+  { image: "employee6.jpg", position: "Cashier", name: "Julien Lefevre" },
 ]);
 
 // FAQ data

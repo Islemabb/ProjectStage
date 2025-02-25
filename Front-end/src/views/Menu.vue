@@ -134,7 +134,13 @@ const closeCart = () => {
 };
 
 const commander = () => {
-  router.push("/commander");
+  if(window.isLogged){
+    router.push("/commander");
+  }
+  else{
+    router.push('/connexion');
+  }
+  
 }
 
 const addToCart = async (item) => {
